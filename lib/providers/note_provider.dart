@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:notes_app_supabase/models/note.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class NoteProvider with ChangeNotifier {
+class NoteProvider {
   final database = Supabase.instance.client.from("notes");
 
   //Add to notes
