@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:notes_app_supabase/models/note.dart';
 import 'package:notes_app_supabase/providers/note_provider.dart';
-import 'package:provider/provider.dart';
-
-enum Actions { add, update, delete }
 
 class HomePage extends StatelessWidget {
   final noteProvider = NoteProvider();
@@ -32,10 +29,15 @@ class HomePage extends StatelessWidget {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(onPressed: () {}, icon: Icon(Icons.edit)),
                       IconButton(
                         onPressed: () {
-                          noteProvider.deleteNote(note);
+                          updateNote(context, note);
+                        },
+                        icon: Icon(Icons.edit),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          deleteNote(context, note);
                         },
                         icon: Icon(Icons.delete),
                       ),
@@ -49,53 +51,93 @@ class HomePage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showMessageDialogWithAction(context, controller.text, Actions.add);
+          addNote(context);
         },
         child: Icon(Icons.add),
       ),
     );
   }
 
-  Future<dynamic> showMessageDialogWithAction(
-    BuildContext context,
-    String message,
-    Actions action,
-  ) {
-    return showDialog(
+  void addNote(BuildContext context) {
+    showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("${action.name} note"),
-          content: TextField(controller: controller),
-          actions: [
-            TextButton(
-              onPressed: () {
-                controller.clear();
-                Navigator.pop(context);
-              },
-              child: Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                switch (action) {
-                  case Actions.add:
-                    noteProvider.addNote(Note(content: controller.text));
-                    break;
-                  case Actions.update:
-                    break;
-                  case Actions.delete:
-                    noteProvider.deleteNote(Note(content: controller.text));
-                    break;
-                }
+      builder:
+          (context) => AlertDialog(
+            title: Text("Add note"),
+            content: TextField(controller: controller),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  noteProvider.addNote(Note(content: controller.text));
+                  controller.clear();
+                  Navigator.pop(context);
+                },
+                child: Text("Add"),
+              ),
+              TextButton(
+                onPressed: () {
+                  controller.clear();
+                  Navigator.pop(context);
+                },
+                child: Text("Cancel"),
+              ),
+            ],
+          ),
+    );
+  }
 
-                controller.clear();
-                Navigator.pop(context);
-              },
-              child: Text(action.name),
-            ),
-          ],
-        );
-      },
+  void updateNote(BuildContext context, Note oldNote) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text("Update note"),
+            content: TextField(controller: controller),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  noteProvider.updateNote(oldNote, controller.text);
+                  controller.clear();
+                  Navigator.pop(context);
+                },
+                child: Text("Update"),
+              ),
+              TextButton(
+                onPressed: () {
+                  controller.clear();
+                  Navigator.pop(context);
+                },
+                child: Text("Cancel"),
+              ),
+            ],
+          ),
+    );
+  }
+
+  void deleteNote(BuildContext context, Note oldNote) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text("Delete note"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  noteProvider.deleteNote(oldNote);
+                  controller.clear();
+                  Navigator.pop(context);
+                },
+                child: Text("Delete"),
+              ),
+              TextButton(
+                onPressed: () {
+                  controller.clear();
+                  Navigator.pop(context);
+                },
+                child: Text("Cancel"),
+              ),
+            ],
+          ),
     );
   }
 }
